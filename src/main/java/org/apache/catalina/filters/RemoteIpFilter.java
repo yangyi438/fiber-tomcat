@@ -46,6 +46,7 @@ import org.apache.catalina.AccessLog;
 import org.apache.catalina.Globals;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.threads.ThreadSharedObjectPool;
 
 /**
  * <p>
@@ -442,7 +443,7 @@ import org.apache.juli.logging.LogFactory;
 public class RemoteIpFilter implements Filter {
     public static class XForwardedRequest extends HttpServletRequestWrapper {
 
-        static final ThreadLocal<SimpleDateFormat[]> threadLocalDateFormats = new ThreadLocal<SimpleDateFormat[]>() {
+        static final ThreadSharedObjectPool<SimpleDateFormat[]> threadLocalDateFormats = new ThreadSharedObjectPool<SimpleDateFormat[]>() {
             @Override
             protected SimpleDateFormat[] initialValue() {
                 return new SimpleDateFormat[] {
@@ -490,7 +491,7 @@ public class RemoteIpFilter implements Filter {
             if (value == null) {
                 return -1;
             }
-            DateFormat[] dateFormats = threadLocalDateFormats.get();
+            SimpleDateFormat[] dateFormats = threadLocalDateFormats.get();
             Date date = null;
             for (int i = 0; ((i < dateFormats.length) && (date == null)); i++) {
                 DateFormat dateFormat = dateFormats[i];
@@ -500,6 +501,7 @@ public class RemoteIpFilter implements Filter {
                     // Ignore
                 }
             }
+            threadLocalDateFormats.recycle(dateFormats);
             if (date == null) {
                 throw new IllegalArgumentException(value);
             }

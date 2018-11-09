@@ -40,7 +40,6 @@ import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.digester.Digester;
 import org.apache.tomcat.util.digester.Rule;
 import org.apache.tomcat.util.digester.RuleSet;
-import org.apache.tomcat.util.log.SystemLogHandler;
 import org.apache.tomcat.util.res.StringManager;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
@@ -755,8 +754,9 @@ public class Catalina {
 
     protected void initStreams() {
         // Replace System.out and System.err with a custom PrintStream
-        System.setOut(new SystemLogHandler(System.out));
-        System.setErr(new SystemLogHandler(System.err));
+//fixme change
+//        System.setOut(new SystemLogHandler(System.out));
+//        System.setErr(new SystemLogHandler(System.err));
     }
 
 

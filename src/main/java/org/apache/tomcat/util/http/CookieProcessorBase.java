@@ -16,6 +16,8 @@
  */
 package org.apache.tomcat.util.http;
 
+import org.apache.tomcat.util.threads.ThreadSharedObjectPool;
+
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -26,9 +28,8 @@ public abstract class CookieProcessorBase implements CookieProcessor {
 
     private static final String COOKIE_DATE_PATTERN = "EEE, dd-MMM-yyyy HH:mm:ss z";
 
-    protected static final ThreadLocal<DateFormat> COOKIE_DATE_FORMAT =
-        new ThreadLocal<DateFormat>() {
-        @Override
+    protected static final ThreadSharedObjectPool<DateFormat> COOKIE_DATE_FORMAT =
+        new ThreadSharedObjectPool<DateFormat>() {
         protected DateFormat initialValue() {
             DateFormat df =
                 new SimpleDateFormat(COOKIE_DATE_PATTERN, Locale.US);
@@ -40,6 +41,8 @@ public abstract class CookieProcessorBase implements CookieProcessor {
     protected static final String ANCIENT_DATE;
 
     static {
-        ANCIENT_DATE = COOKIE_DATE_FORMAT.get().format(new Date(10000));
+        DateFormat dateFormat = COOKIE_DATE_FORMAT.get();
+        ANCIENT_DATE = dateFormat.format(new Date(10000));
+        COOKIE_DATE_FORMAT.recycle(dateFormat);
     }
 }

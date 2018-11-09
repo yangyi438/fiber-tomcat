@@ -60,7 +60,6 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.InstanceManager;
 import org.apache.tomcat.PeriodicEventListener;
 import org.apache.tomcat.util.ExceptionUtils;
-import org.apache.tomcat.util.log.SystemLogHandler;
 import org.apache.tomcat.util.modeler.Registry;
 import org.apache.tomcat.util.modeler.Util;
 
@@ -1067,7 +1066,8 @@ public class StandardWrapper extends ContainerBase
 
         PrintStream out = System.out;
         if (swallowOutput) {
-            SystemLogHandler.startCapture();
+//fixme change
+//            SystemLogHandler.startCapture();
         }
 
         Servlet servlet;
@@ -1136,14 +1136,15 @@ public class StandardWrapper extends ContainerBase
             loadTime=System.currentTimeMillis() -t1;
         } finally {
             if (swallowOutput) {
-                String log = SystemLogHandler.stopCapture();
-                if (log != null && log.length() > 0) {
-                    if (getServletContext() != null) {
-                        getServletContext().log(log);
-                    } else {
-                        out.println(log);
-                    }
-                }
+                //fixme change
+//                String log = SystemLogHandler.stopCapture();
+//                if (log != null && log.length() > 0) {
+//                    if (getServletContext() != null) {
+//                        getServletContext().log(log);
+//                    } else {
+//                        out.println(log);
+//                    }
+//                }
             }
         }
         return servlet;
@@ -1374,7 +1375,7 @@ public class StandardWrapper extends ContainerBase
         if (instanceInitialized) {
             PrintStream out = System.out;
             if (swallowOutput) {
-                SystemLogHandler.startCapture();
+                //SystemLogHandler.startCapture();
             }
 
             // Call the servlet destroy() method
@@ -1421,14 +1422,15 @@ public class StandardWrapper extends ContainerBase
                 }
                 // Write captured output
                 if (swallowOutput) {
-                    String log = SystemLogHandler.stopCapture();
-                    if (log != null && log.length() > 0) {
-                        if (getServletContext() != null) {
-                            getServletContext().log(log);
-                        } else {
-                            out.println(log);
-                        }
-                    }
+                    //fixme change
+//                    String log = SystemLogHandler.stopCapture();
+//                    if (log != null && log.length() > 0) {
+//                        if (getServletContext() != null) {
+//                            getServletContext().log(log);
+//                        } else {
+//                            out.println(log);
+//                        }
+//                    }
                 }
             }
         }

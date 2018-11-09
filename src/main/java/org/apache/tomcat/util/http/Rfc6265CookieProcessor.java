@@ -18,6 +18,7 @@ package org.apache.tomcat.util.http;
 
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.text.DateFormat;
 import java.text.FieldPosition;
 import java.util.BitSet;
 import java.util.Date;
@@ -130,10 +131,12 @@ public class Rfc6265CookieProcessor extends CookieProcessorBase {
             if (maxAge == 0) {
                 header.append(ANCIENT_DATE);
             } else {
-                COOKIE_DATE_FORMAT.get().format(
+                DateFormat dateFormat = COOKIE_DATE_FORMAT.get();
+                dateFormat.format(
                         new Date(System.currentTimeMillis() + maxAge * 1000L),
                         header,
                         new FieldPosition(0));
+                COOKIE_DATE_FORMAT.recycle(dateFormat);
             }
         }
 

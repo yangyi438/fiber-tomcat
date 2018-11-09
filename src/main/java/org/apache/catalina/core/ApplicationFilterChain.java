@@ -60,7 +60,9 @@ final class ApplicationFilterChain implements FilterChain, CometFilterChain {
     private static final ThreadLocal<ServletResponse> lastServicedResponse;
 
     static {
-        if (ApplicationDispatcher.WRAP_SAME_OBJECT) {
+//        if (ApplicationDispatcher.WRAP_SAME_OBJECT) {
+        //fixme change
+        if (false) {
             lastServicedRequest = new ThreadLocal<>();
             lastServicedResponse = new ThreadLocal<>();
         } else {

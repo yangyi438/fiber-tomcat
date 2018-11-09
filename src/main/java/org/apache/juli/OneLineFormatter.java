@@ -17,6 +17,8 @@
 
 package org.apache.juli;
 
+import org.apache.tomcat.util.threads.ThreadSharedObjectPool;
+
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.management.ManagementFactory;
@@ -43,23 +45,23 @@ public class OneLineFormatter extends Formatter {
     private static final Object threadMxBeanLock = new Object();
     private static volatile ThreadMXBean threadMxBean = null;
     private static final int THREAD_NAME_CACHE_SIZE = 10000;
-    private static ThreadLocal<LinkedHashMap<Integer,String>> threadNameCache =
-            new ThreadLocal<LinkedHashMap<Integer,String>>() {
-
-        @Override
-        protected LinkedHashMap<Integer,String> initialValue() {
-            return new LinkedHashMap<Integer,String>() {
-
-                private static final long serialVersionUID = 1L;
-
-                @Override
-                protected boolean removeEldestEntry(
-                        Entry<Integer, String> eldest) {
-                    return (size() > THREAD_NAME_CACHE_SIZE);
-                }
-            };
-        }
-    };
+//    private static ThreadLocal<LinkedHashMap<Integer,String>> threadNameCache =
+//            new ThreadLocal<LinkedHashMap<Integer,String>>() {
+//
+//        @Override
+//        protected LinkedHashMap<Integer,String> initialValue() {
+//            return new LinkedHashMap<Integer,String>() {
+//
+//                private static final long serialVersionUID = 1L;
+//
+//                @Override
+//                protected boolean removeEldestEntry(
+//                        Entry<Integer, String> eldest) {
+//                    return (size() > THREAD_NAME_CACHE_SIZE);
+//                }
+//            };
+//        }
+//    };
 
     /* Timestamp format */
     private static final String timeFormat = "dd-MMM-yyyy HH:mm:ss";
@@ -83,8 +85,8 @@ public class OneLineFormatter extends Formatter {
     /**
      * Thread local date format cache.
      */
-    private static final ThreadLocal<DateFormatCache> localDateCache =
-            new ThreadLocal<DateFormatCache>() {
+    private static final ThreadSharedObjectPool<DateFormatCache> localDateCache =
+            new ThreadSharedObjectPool<DateFormatCache>() {
         @Override
         protected DateFormatCache initialValue() {
             return new DateFormatCache(localCacheSize, timeFormat, globalDateCache);
@@ -141,7 +143,9 @@ public class OneLineFormatter extends Formatter {
     }
 
     protected void addTimestamp(StringBuilder buf, long timestamp) {
-        buf.append(localDateCache.get().getFormat(timestamp));
+        DateFormatCache dateFormatCache = localDateCache.get();
+        buf.append(dateFormatCache.getFormat(timestamp));
+        localDateCache.recycle(dateFormatCache);
         long frac = timestamp % 1000;
         buf.append('.');
         if (frac < 100) {
@@ -155,6 +159,7 @@ public class OneLineFormatter extends Formatter {
         buf.append(frac);
     }
 
+    //fixme 这里的threadNameCache直接就干掉了,删除这个功能,不想使用threadLocal
 
     /**
      * LogRecord has threadID but no thread name.
@@ -166,38 +171,39 @@ public class OneLineFormatter extends Formatter {
      * int in LogRecord for a long value and the resulting mess that follows.
      */
     private static String getThreadName(int logRecordThreadId) {
-        Map<Integer,String> cache = threadNameCache.get();
-        String result = null;
-
-        if (logRecordThreadId > (Integer.MAX_VALUE / 2)) {
-            result = cache.get(Integer.valueOf(logRecordThreadId));
-        }
-
-        if (result != null) {
-            return result;
-        }
-
-        if (logRecordThreadId > Integer.MAX_VALUE / 2) {
-            result = UNKNOWN_THREAD_NAME + logRecordThreadId;
-        } else {
-            // Double checked locking OK as threadMxBean is volatile
-            if (threadMxBean == null) {
-                synchronized (threadMxBeanLock) {
-                    if (threadMxBean == null) {
-                        threadMxBean = ManagementFactory.getThreadMXBean();
-                    }
-                }
-            }
-            ThreadInfo threadInfo =
-                    threadMxBean.getThreadInfo(logRecordThreadId);
-            if (threadInfo == null) {
-                return Long.toString(logRecordThreadId);
-            }
-            result = threadInfo.getThreadName();
-        }
-
-        cache.put(Integer.valueOf(logRecordThreadId), result);
-
-        return result;
+        return Long.toString(logRecordThreadId);
+        // Map<Integer,String> cache = threadNameCache.get();
+//        String result = null;
+//
+//        if (logRecordThreadId > (Integer.MAX_VALUE / 2)) {
+//            result = cache.get(Integer.valueOf(logRecordThreadId));
+//        }
+//
+//        if (result != null) {
+//            return result;
+//        }
+//
+//        if (logRecordThreadId > Integer.MAX_VALUE / 2) {
+//            result = UNKNOWN_THREAD_NAME + logRecordThreadId;
+//        } else {
+//            // Double checked locking OK as threadMxBean is volatile
+//            if (threadMxBean == null) {
+//                synchronized (threadMxBeanLock) {
+//                    if (threadMxBean == null) {
+//                        threadMxBean = ManagementFactory.getThreadMXBean();
+//                    }
+//                }
+//            }
+//            ThreadInfo threadInfo =
+//                    threadMxBean.getThreadInfo(logRecordThreadId);
+//            if (threadInfo == null) {
+//                return Long.toString(logRecordThreadId);
+//            }
+//            result = threadInfo.getThreadName();
+//        }
+//
+//        cache.put(Integer.valueOf(logRecordThreadId), result);
+//
+//        return result;
     }
 }

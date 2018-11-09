@@ -133,13 +133,13 @@ public class ApplicationContext implements ServletContext {
     /**
      * The context attributes for this context.
      */
-    protected Map<String,Object> attributes = new ConcurrentHashMap<>();
+    protected Map<String, Object> attributes = new ConcurrentHashMap<>();
 
 
     /**
      * List of read only attributes for this context.
      */
-    private final Map<String,String> readOnlyAttributes = new ConcurrentHashMap<>();
+    private final Map<String, String> readOnlyAttributes = new ConcurrentHashMap<>();
 
 
     /**
@@ -175,20 +175,21 @@ public class ApplicationContext implements ServletContext {
     /**
      * The merged context initialization parameters for this Context.
      */
-    private final ConcurrentMap<String,String> parameters = new ConcurrentHashMap<>();
+    private final ConcurrentMap<String, String> parameters = new ConcurrentHashMap<>();
 
 
     /**
      * The string manager for this package.
      */
     private static final StringManager sm =
-      StringManager.getManager(Constants.Package);
+            StringManager.getManager(Constants.Package);
 
 
-    /**
-     * Thread local data used during request dispatch.
-     */
-    private final ThreadLocal<DispatchData> dispatchData = new ThreadLocal<>();
+//    /**
+//     * Thread local data used during request dispatch.
+//     */
+//    private final ThreadLocal<DispatchData> dispatchData = new ThreadLocal<>();
+    //fixme change
 
 
     /**
@@ -511,11 +512,7 @@ public class ApplicationContext implements ServletContext {
         pos = normalizedPath.length();
 
         // Use the thread local URI and mapping data
-        DispatchData dd = dispatchData.get();
-        if (dd == null) {
-            dd = new DispatchData();
-            dispatchData.set(dd);
-        }
+        DispatchData dd =dd = new DispatchData();
 
         MessageBytes uriMB = dd.uriMB;
         uriMB.recycle();
@@ -566,16 +563,14 @@ public class ApplicationContext implements ServletContext {
     }
 
 
-
     /**
      * Return the URL to the resource that is mapped to a specified path.
      * The path must begin with a "/" and is interpreted as relative to the
      * current context root.
      *
      * @param path The path to the desired resource
-     *
-     * @exception MalformedURLException if the path is not given
-     *  in the correct form
+     * @throws MalformedURLException if the path is not given
+     *                               in the correct form
      */
     @Override
     public URL getResource(String path) throws MalformedURLException {
@@ -664,7 +659,7 @@ public class ApplicationContext implements ServletContext {
         }
         if (!path.startsWith("/")) {
             throw new IllegalArgumentException
-                (sm.getString("applicationContext.resourcePaths.iae", path));
+                    (sm.getString("applicationContext.resourcePaths.iae", path));
         }
 
         WebResourceRoot resources = context.getResources();
@@ -747,10 +742,9 @@ public class ApplicationContext implements ServletContext {
      * Writes the specified exception and message to a servlet log file.
      *
      * @param exception Exception to be reported
-     * @param message Message to be written
-     *
+     * @param message   Message to be written
      * @deprecated As of Java Servlet API 2.1, use
-     *  <code>log(String, Throwable)</code> instead
+     * <code>log(String, Throwable)</code> instead
      */
     @Override
     @Deprecated
@@ -764,7 +758,7 @@ public class ApplicationContext implements ServletContext {
     /**
      * Writes the specified message and exception to a servlet log file.
      *
-     * @param message Message to be written
+     * @param message   Message to be written
      * @param throwable Exception to be reported
      */
     @Override
@@ -787,7 +781,7 @@ public class ApplicationContext implements ServletContext {
 
         // Remove the specified attribute
         // Check for read only attribute
-        if (readOnlyAttributes.containsKey(name)){
+        if (readOnlyAttributes.containsKey(name)) {
             return;
         }
         value = attributes.remove(name);
@@ -800,23 +794,23 @@ public class ApplicationContext implements ServletContext {
         if ((listeners == null) || (listeners.length == 0))
             return;
         ServletContextAttributeEvent event =
-          new ServletContextAttributeEvent(context.getServletContext(),
-                                            name, value);
+                new ServletContextAttributeEvent(context.getServletContext(),
+                        name, value);
         for (int i = 0; i < listeners.length; i++) {
             if (!(listeners[i] instanceof ServletContextAttributeListener))
                 continue;
             ServletContextAttributeListener listener =
-                (ServletContextAttributeListener) listeners[i];
+                    (ServletContextAttributeListener) listeners[i];
             try {
                 context.fireContainerEvent("beforeContextAttributeRemoved",
-                                           listener);
+                        listener);
                 listener.attributeRemoved(event);
                 context.fireContainerEvent("afterContextAttributeRemoved",
-                                           listener);
+                        listener);
             } catch (Throwable t) {
                 ExceptionUtils.handleThrowable(t);
                 context.fireContainerEvent("afterContextAttributeRemoved",
-                                           listener);
+                        listener);
                 // FIXME - should we do anything besides log these?
                 log(sm.getString("applicationContext.attributeEvent"), t);
             }
@@ -829,7 +823,7 @@ public class ApplicationContext implements ServletContext {
      * Bind the specified value with the specified context attribute name,
      * replacing any existing value for that name.
      *
-     * @param name Attribute name to be bound
+     * @param name  Attribute name to be bound
      * @param value New attribute value to be bound
      */
     @Override
@@ -838,7 +832,7 @@ public class ApplicationContext implements ServletContext {
         // Name cannot be null
         if (name == null)
             throw new IllegalArgumentException
-                (sm.getString("applicationContext.setAttribute.namenull"));
+                    (sm.getString("applicationContext.setAttribute.namenull"));
 
         // Null value is the same as removeAttribute()
         if (value == null) {
@@ -861,40 +855,40 @@ public class ApplicationContext implements ServletContext {
         ServletContextAttributeEvent event = null;
         if (replaced)
             event =
-                new ServletContextAttributeEvent(context.getServletContext(),
-                                                 name, oldValue);
+                    new ServletContextAttributeEvent(context.getServletContext(),
+                            name, oldValue);
         else
             event =
-                new ServletContextAttributeEvent(context.getServletContext(),
-                                                 name, value);
+                    new ServletContextAttributeEvent(context.getServletContext(),
+                            name, value);
 
         for (int i = 0; i < listeners.length; i++) {
             if (!(listeners[i] instanceof ServletContextAttributeListener))
                 continue;
             ServletContextAttributeListener listener =
-                (ServletContextAttributeListener) listeners[i];
+                    (ServletContextAttributeListener) listeners[i];
             try {
                 if (replaced) {
                     context.fireContainerEvent
-                        ("beforeContextAttributeReplaced", listener);
+                            ("beforeContextAttributeReplaced", listener);
                     listener.attributeReplaced(event);
                     context.fireContainerEvent("afterContextAttributeReplaced",
-                                               listener);
+                            listener);
                 } else {
                     context.fireContainerEvent("beforeContextAttributeAdded",
-                                               listener);
+                            listener);
                     listener.attributeAdded(event);
                     context.fireContainerEvent("afterContextAttributeAdded",
-                                               listener);
+                            listener);
                 }
             } catch (Throwable t) {
                 ExceptionUtils.handleThrowable(t);
                 if (replaced)
                     context.fireContainerEvent("afterContextAttributeReplaced",
-                                               listener);
+                            listener);
                 else
                     context.fireContainerEvent("afterContextAttributeAdded",
-                                               listener);
+                            listener);
                 // FIXME - should we do anything besides log these?
                 log(sm.getString("applicationContext.attributeEvent"), t);
             }
@@ -905,21 +899,22 @@ public class ApplicationContext implements ServletContext {
 
     /**
      * Add filter to context.
-     * @param   filterName  Name of filter to add
-     * @param   filterClass Name of filter class
-     * @return  <code>null</code> if the filter has already been fully defined,
-     *          else a {@link javax.servlet.FilterRegistration.Dynamic} object
-     *          that can be used to further configure the filter
-     * @throws IllegalStateException if the context has already been initialised
+     *
+     * @param filterName  Name of filter to add
+     * @param filterClass Name of filter class
+     * @return <code>null</code> if the filter has already been fully defined,
+     * else a {@link javax.servlet.FilterRegistration.Dynamic} object
+     * that can be used to further configure the filter
+     * @throws IllegalStateException         if the context has already been initialised
      * @throws UnsupportedOperationException - if this context was passed to the
-     *         {@link ServletContextListener#contextInitialized(javax.servlet.ServletContextEvent)}
-     *         method of a {@link ServletContextListener} that was not declared
-     *         in web.xml, a web-fragment or annotated with
-     *         {@link javax.servlet.annotation.WebListener}.
+     *                                       {@link ServletContextListener#contextInitialized(javax.servlet.ServletContextEvent)}
+     *                                       method of a {@link ServletContextListener} that was not declared
+     *                                       in web.xml, a web-fragment or annotated with
+     *                                       {@link javax.servlet.annotation.WebListener}.
      */
     @Override
     public FilterRegistration.Dynamic addFilter(String filterName,
-            String filterClass) throws IllegalStateException {
+                                                String filterClass) throws IllegalStateException {
 
         return addFilter(filterName, filterClass, null);
     }
@@ -927,21 +922,22 @@ public class ApplicationContext implements ServletContext {
 
     /**
      * Add filter to context.
-     * @param   filterName  Name of filter to add
-     * @param   filter      Filter to add
-     * @return  <code>null</code> if the filter has already been fully defined,
-     *          else a {@link javax.servlet.FilterRegistration.Dynamic} object
-     *          that can be used to further configure the filter
-     * @throws IllegalStateException if the context has already been initialised
+     *
+     * @param filterName Name of filter to add
+     * @param filter     Filter to add
+     * @return <code>null</code> if the filter has already been fully defined,
+     * else a {@link javax.servlet.FilterRegistration.Dynamic} object
+     * that can be used to further configure the filter
+     * @throws IllegalStateException         if the context has already been initialised
      * @throws UnsupportedOperationException - if this context was passed to the
-     *         {@link ServletContextListener#contextInitialized(javax.servlet.ServletContextEvent)}
-     *         method of a {@link ServletContextListener} that was not declared
-     *         in web.xml, a web-fragment or annotated with
-     *         {@link javax.servlet.annotation.WebListener}.
+     *                                       {@link ServletContextListener#contextInitialized(javax.servlet.ServletContextEvent)}
+     *                                       method of a {@link ServletContextListener} that was not declared
+     *                                       in web.xml, a web-fragment or annotated with
+     *                                       {@link javax.servlet.annotation.WebListener}.
      */
     @Override
     public FilterRegistration.Dynamic addFilter(String filterName,
-            Filter filter) throws IllegalStateException {
+                                                Filter filter) throws IllegalStateException {
 
         return addFilter(filterName, null, filter);
     }
@@ -949,27 +945,28 @@ public class ApplicationContext implements ServletContext {
 
     /**
      * Add filter to context.
-     * @param   filterName  Name of filter to add
-     * @param   filterClass Class of filter to add
-     * @return  <code>null</code> if the filter has already been fully defined,
-     *          else a {@link javax.servlet.FilterRegistration.Dynamic} object
-     *          that can be used to further configure the filter
-     * @throws IllegalStateException if the context has already been initialised
+     *
+     * @param filterName  Name of filter to add
+     * @param filterClass Class of filter to add
+     * @return <code>null</code> if the filter has already been fully defined,
+     * else a {@link javax.servlet.FilterRegistration.Dynamic} object
+     * that can be used to further configure the filter
+     * @throws IllegalStateException         if the context has already been initialised
      * @throws UnsupportedOperationException - if this context was passed to the
-     *         {@link ServletContextListener#contextInitialized(javax.servlet.ServletContextEvent)}
-     *         method of a {@link ServletContextListener} that was not declared
-     *         in web.xml, a web-fragment or annotated with
-     *         {@link javax.servlet.annotation.WebListener}.
+     *                                       {@link ServletContextListener#contextInitialized(javax.servlet.ServletContextEvent)}
+     *                                       method of a {@link ServletContextListener} that was not declared
+     *                                       in web.xml, a web-fragment or annotated with
+     *                                       {@link javax.servlet.annotation.WebListener}.
      */
     @Override
     public FilterRegistration.Dynamic addFilter(String filterName,
-            Class<? extends Filter> filterClass) throws IllegalStateException {
+                                                Class<? extends Filter> filterClass) throws IllegalStateException {
 
         return addFilter(filterName, filterClass.getName(), null);
     }
 
     private FilterRegistration.Dynamic addFilter(String filterName,
-            String filterClass, Filter filter) throws IllegalStateException {
+                                                 String filterClass, Filter filter) throws IllegalStateException {
 
         if (filterName == null || filterName.equals("")) {
             throw new IllegalArgumentException(sm.getString(
@@ -1010,7 +1007,7 @@ public class ApplicationContext implements ServletContext {
 
     @Override
     public <T extends Filter> T createFilter(Class<T> c)
-    throws ServletException {
+            throws ServletException {
         try {
             @SuppressWarnings("unchecked")
             T filter = (T) context.getInstanceManager().newInstance(c.getName());
@@ -1037,21 +1034,22 @@ public class ApplicationContext implements ServletContext {
 
     /**
      * Add servlet to context.
-     * @param   servletName  Name of servlet to add
-     * @param   servletClass Name of servlet class
-     * @return  <code>null</code> if the servlet has already been fully defined,
-     *          else a {@link javax.servlet.ServletRegistration.Dynamic} object
-     *          that can be used to further configure the servlet
-     * @throws IllegalStateException if the context has already been initialised
+     *
+     * @param servletName  Name of servlet to add
+     * @param servletClass Name of servlet class
+     * @return <code>null</code> if the servlet has already been fully defined,
+     * else a {@link javax.servlet.ServletRegistration.Dynamic} object
+     * that can be used to further configure the servlet
+     * @throws IllegalStateException         if the context has already been initialised
      * @throws UnsupportedOperationException - if this context was passed to the
-     *         {@link ServletContextListener#contextInitialized(javax.servlet.ServletContextEvent)}
-     *         method of a {@link ServletContextListener} that was not declared
-     *         in web.xml, a web-fragment or annotated with
-     *         {@link javax.servlet.annotation.WebListener}.
+     *                                       {@link ServletContextListener#contextInitialized(javax.servlet.ServletContextEvent)}
+     *                                       method of a {@link ServletContextListener} that was not declared
+     *                                       in web.xml, a web-fragment or annotated with
+     *                                       {@link javax.servlet.annotation.WebListener}.
      */
     @Override
     public ServletRegistration.Dynamic addServlet(String servletName,
-            String servletClass) throws IllegalStateException {
+                                                  String servletClass) throws IllegalStateException {
 
         return addServlet(servletName, servletClass, null);
     }
@@ -1059,21 +1057,22 @@ public class ApplicationContext implements ServletContext {
 
     /**
      * Add servlet to context.
-     * @param   servletName Name of servlet to add
-     * @param   servlet     Servlet instance to add
-     * @return  <code>null</code> if the servlet has already been fully defined,
-     *          else a {@link javax.servlet.ServletRegistration.Dynamic} object
-     *          that can be used to further configure the servlet
-     * @throws IllegalStateException if the context has already been initialised
+     *
+     * @param servletName Name of servlet to add
+     * @param servlet     Servlet instance to add
+     * @return <code>null</code> if the servlet has already been fully defined,
+     * else a {@link javax.servlet.ServletRegistration.Dynamic} object
+     * that can be used to further configure the servlet
+     * @throws IllegalStateException         if the context has already been initialised
      * @throws UnsupportedOperationException - if this context was passed to the
-     *         {@link ServletContextListener#contextInitialized(javax.servlet.ServletContextEvent)}
-     *         method of a {@link ServletContextListener} that was not declared
-     *         in web.xml, a web-fragment or annotated with
-     *         {@link javax.servlet.annotation.WebListener}.
+     *                                       {@link ServletContextListener#contextInitialized(javax.servlet.ServletContextEvent)}
+     *                                       method of a {@link ServletContextListener} that was not declared
+     *                                       in web.xml, a web-fragment or annotated with
+     *                                       {@link javax.servlet.annotation.WebListener}.
      */
     @Override
     public ServletRegistration.Dynamic addServlet(String servletName,
-            Servlet servlet) throws IllegalStateException {
+                                                  Servlet servlet) throws IllegalStateException {
 
         return addServlet(servletName, null, servlet);
     }
@@ -1081,28 +1080,29 @@ public class ApplicationContext implements ServletContext {
 
     /**
      * Add servlet to context.
-     * @param   servletName  Name of servlet to add
-     * @param   servletClass Class of servlet to add
-     * @return  <code>null</code> if the servlet has already been fully defined,
-     *          else a {@link javax.servlet.ServletRegistration.Dynamic} object
-     *          that can be used to further configure the servlet
-     * @throws IllegalStateException if the context has already been initialised
+     *
+     * @param servletName  Name of servlet to add
+     * @param servletClass Class of servlet to add
+     * @return <code>null</code> if the servlet has already been fully defined,
+     * else a {@link javax.servlet.ServletRegistration.Dynamic} object
+     * that can be used to further configure the servlet
+     * @throws IllegalStateException         if the context has already been initialised
      * @throws UnsupportedOperationException - if this context was passed to the
-     *         {@link ServletContextListener#contextInitialized(javax.servlet.ServletContextEvent)}
-     *         method of a {@link ServletContextListener} that was not declared
-     *         in web.xml, a web-fragment or annotated with
-     *         {@link javax.servlet.annotation.WebListener}.
+     *                                       {@link ServletContextListener#contextInitialized(javax.servlet.ServletContextEvent)}
+     *                                       method of a {@link ServletContextListener} that was not declared
+     *                                       in web.xml, a web-fragment or annotated with
+     *                                       {@link javax.servlet.annotation.WebListener}.
      */
     @Override
     public ServletRegistration.Dynamic addServlet(String servletName,
-            Class<? extends Servlet> servletClass)
-    throws IllegalStateException {
+                                                  Class<? extends Servlet> servletClass)
+            throws IllegalStateException {
 
         return addServlet(servletName, servletClass.getName(), null);
     }
 
     private ServletRegistration.Dynamic addServlet(String servletName,
-            String servletClass, Servlet servlet) throws IllegalStateException {
+                                                   String servletClass, Servlet servlet) throws IllegalStateException {
 
         if (servletName == null || servletName.equals("")) {
             throw new IllegalArgumentException(sm.getString(
@@ -1161,7 +1161,7 @@ public class ApplicationContext implements ServletContext {
 
     @Override
     public <T extends Servlet> T createServlet(Class<T> c)
-    throws ServletException {
+            throws ServletException {
         try {
             @SuppressWarnings("unchecked")
             T servlet = (T) context.getInstanceManager().newInstance(c.getName());
@@ -1244,7 +1244,7 @@ public class ApplicationContext implements ServletContext {
 
 
     /**
-     * @throws IllegalStateException if the context has already been initialised
+     * @throws IllegalStateException    if the context has already been initialised
      * @throws IllegalArgumentException If SSL is requested in combination with
      *                                  anything else or if an unsupported
      *                                  tracking mode is requested
@@ -1358,7 +1358,7 @@ public class ApplicationContext implements ServletContext {
 
         if (t instanceof HttpSessionListener
                 || (t instanceof ServletContextListener &&
-                        newServletContextListenerAllowed)) {
+                newServletContextListenerAllowed)) {
             // Add listener directly to the list of instances rather than to
             // the list of class names.
             context.addApplicationLifecycleListener(t);
@@ -1385,7 +1385,7 @@ public class ApplicationContext implements ServletContext {
         try {
             @SuppressWarnings("unchecked")
             T listener =
-                (T) context.getInstanceManager().newInstance(c);
+                    (T) context.getInstanceManager().newInstance(c);
             if (listener instanceof ServletContextListener ||
                     listener instanceof ServletContextAttributeListener ||
                     listener instanceof ServletRequestListener ||

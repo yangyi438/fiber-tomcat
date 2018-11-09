@@ -46,6 +46,7 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.collections.SynchronizedStack;
+import org.apache.tomcat.util.threads.ThreadSharedObjectPool;
 
 
 /**
@@ -385,26 +386,27 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
     /**
      * Thread local date format cache.
      */
-    private static final ThreadLocal<DateFormatCache> localDateCache =
-            new ThreadLocal<DateFormatCache>() {
+    private static final ThreadSharedObjectPool<DateFormatCache> localDateCache =
+            new ThreadSharedObjectPool<DateFormatCache>() {
         @Override
         protected DateFormatCache initialValue() {
             return new DateFormatCache(localCacheSize, Locale.getDefault(), globalDateCache);
         }
     };
 
+//fixme change
+//    /**
+//     * The system time when we last updated the Date that this valve
+//     * uses for log lines.
+//     */
+//    private static final ThreadSharedObjectPool<Date> localDate =
+//            new ThreadSharedObjectPool<Date>() {
+//        @Override
+//        protected Date initialValue() {
+//            return new Date();
+//        }
+//    };
 
-    /**
-     * The system time when we last updated the Date that this valve
-     * uses for log lines.
-     */
-    private static final ThreadLocal<Date> localDate =
-            new ThreadLocal<Date>() {
-        @Override
-        protected Date initialValue() {
-            return new Date();
-        }
-    };
 
     /**
      * Are we doing conditional logging. default null.
@@ -679,9 +681,7 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
      * @return Date
      */
     private static Date getDate(long systime) {
-        Date date = localDate.get();
-        date.setTime(systime);
-        return date;
+        return new Date(systime);
     }
 
 
@@ -1005,7 +1005,9 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
             }
             switch (type) {
             case CLF:
-                buf.append(localDateCache.get().getFormat(timestamp));
+                DateFormatCache dateFormatCache = localDateCache.get();
+                buf.append(dateFormatCache.getFormat(timestamp));
+                localDateCache.recycle(dateFormatCache);
                 break;
             case SEC:
                 buf.append(Long.toString(timestamp / 1000));
@@ -1026,7 +1028,9 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
                 buf.append(Long.toString(frac));
                 break;
             case SDF:
-                String temp = localDateCache.get().getFormat(format, locale, timestamp);
+                DateFormatCache dateFormat = localDateCache.get();
+                String temp = dateFormat.getFormat(format, locale, timestamp);
+                localDateCache.recycle(dateFormat);
                 if (usesMsecs) {
                     frac = timestamp % 1000;
                     StringBuilder trippleMsec = new StringBuilder(4);

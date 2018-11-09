@@ -33,6 +33,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.threads.ThreadSharedObjectPool;
 
 
 /**
@@ -55,8 +56,8 @@ public class RequestDumperFilter implements Filter {
     private static final String NON_HTTP_RES_MSG =
         "Not available. Non-http response.";
 
-    private static final ThreadLocal<Timestamp> timestamp =
-            new ThreadLocal<Timestamp>() {
+    private static final ThreadSharedObjectPool<Timestamp> timestamp =
+            new ThreadSharedObjectPool<Timestamp>() {
         @Override
         protected Timestamp initialValue() {
             return new Timestamp();
@@ -260,6 +261,7 @@ public class RequestDumperFilter implements Filter {
             ts.date.setTime(currentTime - (currentTime % 1000));
             ts.update();
         }
+        timestamp.recycle(ts);
         return ts.dateString;
     }
 

@@ -75,9 +75,10 @@ final class ApplicationDispatcher implements AsyncDispatcher, RequestDispatcher 
         String wrapSameObject = System.getProperty(
                 "org.apache.catalina.core.ApplicationDispatcher.WRAP_SAME_OBJECT");
         if (wrapSameObject == null) {
-            WRAP_SAME_OBJECT = STRICT_SERVLET_COMPLIANCE;
+            WRAP_SAME_OBJECT = false;
         } else {
-            WRAP_SAME_OBJECT = Boolean.parseBoolean(wrapSameObject);
+//            WRAP_SAME_OBJECT = Boolean.parseBoolean(wrapSameObject);
+            WRAP_SAME_OBJECT = false;
         }
     }
 

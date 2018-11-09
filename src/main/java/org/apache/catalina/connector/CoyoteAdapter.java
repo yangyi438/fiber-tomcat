@@ -21,6 +21,7 @@ import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.util.EnumSet;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Supplier;
 
 import javax.servlet.ReadListener;
 import javax.servlet.RequestDispatcher;
@@ -84,14 +85,11 @@ public class CoyoteAdapter implements Adapter {
         Boolean.parseBoolean(System.getProperty("org.apache.catalina.connector.CoyoteAdapter.ALLOW_BACKSLASH", "false"));
 
 
-    private static final ThreadLocal<String> THREAD_NAME =
-            new ThreadLocal<String>() {
-
-                @Override
-                protected String initialValue() {
-                    return Thread.currentThread().getName();
-                }
-
+    private static final Supplier<String> THREAD_NAME = new Supplier<String>() {
+        @Override
+        public String get() {
+            return java.lang.Thread.currentThread().getName();
+        }
     };
 
     // ----------------------------------------------------------- Constructors

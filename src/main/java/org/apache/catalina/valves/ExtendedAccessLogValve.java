@@ -39,6 +39,7 @@ import org.apache.catalina.util.ServerInfo;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
+import org.apache.tomcat.util.threads.ThreadSharedObjectPool;
 
 /**
  * An implementation of the W3c Extended Log File Format. See
@@ -206,8 +207,8 @@ public class ExtendedAccessLogValve extends AccessLogValve {
         // Milli-seconds in 24 hours
         private static final long INTERVAL = (1000 * 60 * 60 * 24);
 
-        private static final ThreadLocal<ElementTimestampStruct> currentDate =
-                new ThreadLocal<ElementTimestampStruct>() {
+        private static final ThreadSharedObjectPool<ElementTimestampStruct> currentDate =
+                new ThreadSharedObjectPool<ElementTimestampStruct>() {
             @Override
             protected ElementTimestampStruct initialValue() {
                 return new ElementTimestampStruct("yyyy-MM-dd");
@@ -226,6 +227,7 @@ public class ExtendedAccessLogValve extends AccessLogValve {
                 eds.currentTimestampString =
                     eds.currentTimestampFormat.format(eds.currentTimestamp);
             }
+            currentDate.recycle(eds);
             buf.append(eds.currentTimestampString);
         }
     }
@@ -234,8 +236,8 @@ public class ExtendedAccessLogValve extends AccessLogValve {
         // Milli-seconds in a second
         private static final long INTERVAL = 1000;
 
-        private static final ThreadLocal<ElementTimestampStruct> currentTime =
-                new ThreadLocal<ElementTimestampStruct>() {
+        private static final ThreadSharedObjectPool<ElementTimestampStruct> currentTime =
+                new ThreadSharedObjectPool<ElementTimestampStruct>() {
             @Override
             protected ElementTimestampStruct initialValue() {
                 return new ElementTimestampStruct("HH:mm:ss");
@@ -254,6 +256,7 @@ public class ExtendedAccessLogValve extends AccessLogValve {
                 eds.currentTimestampString =
                     eds.currentTimestampFormat.format(eds.currentTimestamp);
             }
+            currentTime.recycle(eds);
             buf.append(eds.currentTimestampString);
         }
     }

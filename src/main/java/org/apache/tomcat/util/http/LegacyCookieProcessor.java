@@ -18,11 +18,13 @@ package org.apache.tomcat.util.http;
 
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.text.DateFormat;
 import java.text.FieldPosition;
 import java.util.BitSet;
 import java.util.Date;
 
 import javax.servlet.http.Cookie;
+import javax.xml.crypto.Data;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -330,10 +332,12 @@ public final class LegacyCookieProcessor extends CookieProcessorBase {
                 if (maxAge == 0) {
                     buf.append( ANCIENT_DATE );
                 } else {
-                    COOKIE_DATE_FORMAT.get().format(
+                    DateFormat dateFormat = COOKIE_DATE_FORMAT.get();
+                    dateFormat.format(
                             new Date(System.currentTimeMillis() + maxAge * 1000L),
                             buf,
                             new FieldPosition(0));
+                    COOKIE_DATE_FORMAT.recycle(dateFormat);
                 }
             }
         }

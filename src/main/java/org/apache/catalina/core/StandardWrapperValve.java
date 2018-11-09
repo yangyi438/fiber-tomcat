@@ -40,7 +40,6 @@ import org.apache.catalina.connector.Response;
 import org.apache.catalina.valves.ValveBase;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.buf.MessageBytes;
-import org.apache.tomcat.util.log.SystemLogHandler;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -188,7 +187,7 @@ final class StandardWrapperValve
                 // Swallow output if needed
                 if (context.getSwallowOutput()) {
                     try {
-                        SystemLogHandler.startCapture();
+//                        SystemLogHandler.startCapture();
                         if (request.isAsyncDispatching()) {
                             request.getAsyncContextInternal().doInternalDispatch();
                         } else if (comet) {
@@ -198,10 +197,10 @@ final class StandardWrapperValve
                                     response.getResponse());
                         }
                     } finally {
-                        String log = SystemLogHandler.stopCapture();
-                        if (log != null && log.length() > 0) {
-                            context.getLogger().info(log);
-                        }
+//                        String log = SystemLogHandler.stopCapture();
+//                        if (log != null && log.length() > 0) {
+//                            context.getLogger().info(log);
+//                        }
                     }
                 } else {
                     if (request.isAsyncDispatching()) {
@@ -389,13 +388,15 @@ final class StandardWrapperValve
                 // Swallow output if needed
                 if (context.getSwallowOutput()) {
                     try {
-                        SystemLogHandler.startCapture();
+//fixme change
+//                        SystemLogHandler.startCapture();
                         filterChain.doFilterEvent(request.getEvent());
                     } finally {
-                        String log = SystemLogHandler.stopCapture();
-                        if (log != null && log.length() > 0) {
-                            context.getLogger().info(log);
-                        }
+                        //fixme change
+                        //String log = SystemLogHandler.stopCapture();
+//                        if (log != null && log.length() > 0) {
+//                            context.getLogger().info(log);
+//                        }
                     }
                 } else {
                     filterChain.doFilterEvent(request.getEvent());

@@ -42,7 +42,6 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.InstanceManager;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.descriptor.web.FilterDef;
-import org.apache.tomcat.util.log.SystemLogHandler;
 import org.apache.tomcat.util.modeler.Registry;
 import org.apache.tomcat.util.modeler.Util;
 import org.apache.tomcat.util.res.StringManager;
@@ -273,13 +272,14 @@ public final class ApplicationFilterConfig implements FilterConfig, Serializable
         if (context instanceof StandardContext &&
                 context.getSwallowOutput()) {
             try {
-                SystemLogHandler.startCapture();
+//                SystemLogHandler.startCapture();
                 filter.init(this);
             } finally {
-                String capturedlog = SystemLogHandler.stopCapture();
-                if (capturedlog != null && capturedlog.length() > 0) {
-                    getServletContext().log(capturedlog);
-                }
+                //fixme change
+//                String capturedlog = SystemLogHandler.stopCapture();
+//                if (capturedlog != null && capturedlog.length() > 0) {
+//                    getServletContext().log(capturedlog);
+//                }
             }
         } else {
             filter.init(this);
