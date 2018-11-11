@@ -281,7 +281,7 @@ public abstract class AbstractEndpoint<S> {
     /**
      * External Executor based thread pool.
      */
-    private Executor executor = null;
+    protected Executor executor = null;
     public void setExecutor(Executor executor) {
         this.executor = executor;
         this.internalExecutor = (executor == null);
@@ -908,9 +908,13 @@ public abstract class AbstractEndpoint<S> {
     public abstract boolean getUsePolling();
 
     protected LimitLatch initializeConnectionLatch() {
-        if (maxConnections==-1) return null;
+        int maxConnections = getMaxConnections();
+        if (maxConnections <= 0) {
+            maxConnections = Integer.getInteger("jio.max.connection", 10000);
+            connectionLimitLatch = new LimitLatch(maxConnections);
+        }
         if (connectionLimitLatch==null) {
-            connectionLimitLatch = new LimitLatch(getMaxConnections());
+            connectionLimitLatch = new LimitLatch(maxConnections);
         }
         return connectionLimitLatch;
     }

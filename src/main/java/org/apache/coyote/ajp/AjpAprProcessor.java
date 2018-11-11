@@ -20,8 +20,9 @@ import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.nio.ByteBuffer;
 import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
+
+import co.paralleluniverse.strands.concurrent.ReentrantReadWriteLock;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.jni.Socket;
@@ -134,7 +135,7 @@ public class AjpAprProcessor extends AbstractAjpProcessor<Long> {
     private int writeSocket(int pos, int len, boolean block) {
 
         Lock readLock = socketWrapper.getBlockingStatusReadLock();
-        WriteLock writeLock = socketWrapper.getBlockingStatusWriteLock();
+        ReentrantReadWriteLock.WriteLock writeLock = socketWrapper.getBlockingStatusWriteLock();
         long socket = socketWrapper.getSocket().longValue();
 
         boolean writeDone = false;
@@ -166,7 +167,7 @@ public class AjpAprProcessor extends AbstractAjpProcessor<Long> {
             } finally {
                 // Should have been released above but may not have been on some
                 // exception paths
-                if (writeLock.isHeldByCurrentThread()) {
+                if (writeLock.isHeldByCurrentStrand()) {
                     writeLock.unlock();
                 }
             }
@@ -228,7 +229,7 @@ public class AjpAprProcessor extends AbstractAjpProcessor<Long> {
     private int readSocket(int pos, int len, boolean block) {
 
         Lock readLock = socketWrapper.getBlockingStatusReadLock();
-        WriteLock writeLock = socketWrapper.getBlockingStatusWriteLock();
+        ReentrantReadWriteLock.WriteLock writeLock = socketWrapper.getBlockingStatusWriteLock();
         long socket = socketWrapper.getSocket().longValue();
 
         boolean readDone = false;
@@ -260,7 +261,7 @@ public class AjpAprProcessor extends AbstractAjpProcessor<Long> {
             } finally {
                 // Should have been released above but may not have been on some
                 // exception paths
-                if (writeLock.isHeldByCurrentThread()) {
+                if (writeLock.isHeldByCurrentStrand()) {
                     writeLock.unlock();
                 }
             }

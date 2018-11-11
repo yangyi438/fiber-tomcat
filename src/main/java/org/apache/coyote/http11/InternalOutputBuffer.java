@@ -27,13 +27,14 @@ import org.apache.coyote.Response;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.SocketWrapper;
+import yy.code.io.cosocket.CoSocket;
 
 /**
  * Output buffer.
  *
  * @author <a href="mailto:remm@apache.org">Remy Maucherat</a>
  */
-public class InternalOutputBuffer extends AbstractOutputBuffer<Socket>
+public class InternalOutputBuffer extends AbstractOutputBuffer<CoSocket>
     implements ByteChunk.ByteOutputChannel {
 
     // ----------------------------------------------------------- Constructors
@@ -87,8 +88,8 @@ public class InternalOutputBuffer extends AbstractOutputBuffer<Socket>
     // --------------------------------------------------------- Public Methods
 
     @Override
-    public void init(SocketWrapper<Socket> socketWrapper,
-            AbstractEndpoint<Socket> endpoint) throws IOException {
+    public void init(SocketWrapper<CoSocket> socketWrapper,
+            AbstractEndpoint<CoSocket> endpoint) throws IOException {
 
         outputStream = socketWrapper.getSocket().getOutputStream();
     }

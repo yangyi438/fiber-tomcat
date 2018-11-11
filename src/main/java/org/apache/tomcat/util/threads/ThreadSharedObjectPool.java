@@ -32,14 +32,15 @@ public class ThreadSharedObjectPool<T>{
 
 
     public ThreadSharedObjectPool(int initSize, Supplier<T> supplier) {
-        this.supplier = supplier;
         if (supplier == null) {
-            supplier = new Supplier<T>() {
+            this.supplier = new Supplier<T>() {
                 @Override
                 public T get() {
                     return initialValue();
                 }
             };
+        } else {
+            this.supplier = supplier;
         }
         this.pool = new MpmcArrayQueue<T>(initSize);
         for (int i = 0; i < pool.size(); i++) {

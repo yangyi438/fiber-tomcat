@@ -27,11 +27,9 @@ import org.apache.coyote.http11.filters.BufferedInputFilter;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.http.parser.HttpParser;
+import org.apache.tomcat.util.net.*;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
-import org.apache.tomcat.util.net.JIoEndpoint;
-import org.apache.tomcat.util.net.SSLSupport;
-import org.apache.tomcat.util.net.SocketStatus;
-import org.apache.tomcat.util.net.SocketWrapper;
+import yy.code.io.cosocket.CoSocket;
 
 
 /**
@@ -39,7 +37,7 @@ import org.apache.tomcat.util.net.SocketWrapper;
  *
  * @author Remy Maucherat
  */
-public class Http11Processor extends AbstractHttp11Processor<Socket> {
+public class Http11Processor extends AbstractHttp11Processor<CoSocket> {
 
     private static final Log log = LogFactory.getLog(Http11Processor.class);
     @Override
@@ -51,9 +49,9 @@ public class Http11Processor extends AbstractHttp11Processor<Socket> {
 
 
     public Http11Processor(int headerBufferSize, boolean rejectIllegalHeaderName,
-            JIoEndpoint endpoint, int maxTrailerSize, Set<String> allowedTrailerHeaders,
-            int maxExtensionSize, int maxSwallowSize, String relaxedPathChars,
-            String relaxedQueryChars) {
+                           JIoEndpoint3 endpoint, int maxTrailerSize, Set<String> allowedTrailerHeaders,
+                           int maxExtensionSize, int maxSwallowSize, String relaxedPathChars,
+                           String relaxedQueryChars) {
 
         super(endpoint);
 
@@ -186,13 +184,13 @@ public class Http11Processor extends AbstractHttp11Processor<Socket> {
 
 
     @Override
-    protected void setCometTimeouts(SocketWrapper<Socket> socketWrapper) {
+    protected void setCometTimeouts(SocketWrapper<CoSocket> socketWrapper) {
         // NO-OP for BIO
     }
 
 
     @Override
-    protected boolean breakKeepAliveLoop(SocketWrapper<Socket> socketWrapper) {
+    protected boolean breakKeepAliveLoop(SocketWrapper<CoSocket> socketWrapper) {
         openSocket = keepAlive;
         // If we don't have a pipe-lined request allow this thread to be
         // used by another connection
@@ -404,12 +402,12 @@ public class Http11Processor extends AbstractHttp11Processor<Socket> {
     }
 
     @Override
-    protected AbstractInputBuffer<Socket> getInputBuffer() {
+    protected AbstractInputBuffer<CoSocket> getInputBuffer() {
         return inputBuffer;
     }
 
     @Override
-    protected AbstractOutputBuffer<Socket> getOutputBuffer() {
+    protected AbstractOutputBuffer<CoSocket> getOutputBuffer() {
         return outputBuffer;
     }
 

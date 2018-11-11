@@ -31,6 +31,7 @@ import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.http.parser.HttpParser;
 import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.SocketWrapper;
+import yy.code.io.cosocket.CoSocket;
 
 /**
  * Implementation of InputBuffer which provides HTTP request header parsing as
@@ -38,7 +39,7 @@ import org.apache.tomcat.util.net.SocketWrapper;
  *
  * @author <a href="mailto:remm@apache.org">Remy Maucherat</a>
  */
-public class InternalInputBuffer extends AbstractInputBuffer<Socket> {
+public class InternalInputBuffer extends AbstractInputBuffer<CoSocket> {
 
     private static final Log log = LogFactory.getLog(InternalInputBuffer.class);
 
@@ -478,8 +479,8 @@ public class InternalInputBuffer extends AbstractInputBuffer<Socket> {
 
 
     @Override
-    protected void init(SocketWrapper<Socket> socketWrapper,
-            AbstractEndpoint<Socket> endpoint) throws IOException {
+    protected void init(SocketWrapper<CoSocket> socketWrapper,
+            AbstractEndpoint<CoSocket> endpoint) throws IOException {
         inputStream = socketWrapper.getSocket().getInputStream();
     }
 

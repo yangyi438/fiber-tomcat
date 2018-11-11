@@ -21,8 +21,8 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Iterator;
 import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
+import co.paralleluniverse.strands.concurrent.ReentrantReadWriteLock;
 import org.apache.coyote.ActionCode;
 import org.apache.coyote.ByteBufferHolder;
 import org.apache.coyote.OutputBuffer;
@@ -237,7 +237,7 @@ public class InternalAprOutputBuffer extends AbstractOutputBuffer<Long> {
     private synchronized void writeToSocket(boolean block) throws IOException {
 
         Lock readLock = wrapper.getBlockingStatusReadLock();
-        WriteLock writeLock = wrapper.getBlockingStatusWriteLock();
+        ReentrantReadWriteLock.WriteLock writeLock = wrapper.getBlockingStatusWriteLock();
 
         readLock.lock();
         try {
@@ -270,7 +270,7 @@ public class InternalAprOutputBuffer extends AbstractOutputBuffer<Long> {
         } finally {
             // Should have been released above but may not have been on some
             // exception paths
-            if (writeLock.isHeldByCurrentThread()) {
+            if (writeLock.isHeldByCurrentStrand()) {
                 writeLock.unlock();
             }
         }

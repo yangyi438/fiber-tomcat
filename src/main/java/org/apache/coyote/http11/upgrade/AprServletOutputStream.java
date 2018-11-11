@@ -20,8 +20,8 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
+import co.paralleluniverse.strands.concurrent.ReentrantReadWriteLock;
 import org.apache.tomcat.jni.OS;
 import org.apache.tomcat.jni.Socket;
 import org.apache.tomcat.jni.Status;
@@ -60,7 +60,7 @@ public class AprServletOutputStream extends AbstractServletOutputStream<Long> {
         }
 
         Lock readLock = socketWrapper.getBlockingStatusReadLock();
-        WriteLock writeLock = socketWrapper.getBlockingStatusWriteLock();
+        ReentrantReadWriteLock.WriteLock writeLock = socketWrapper.getBlockingStatusWriteLock();
 
         readLock.lock();
         try {
@@ -92,7 +92,7 @@ public class AprServletOutputStream extends AbstractServletOutputStream<Long> {
         } finally {
             // Should have been released above but may not have been on some
             // exception paths
-            if (writeLock.isHeldByCurrentThread()) {
+            if (writeLock.isHeldByCurrentStrand()) {
                 writeLock.unlock();
             }
         }

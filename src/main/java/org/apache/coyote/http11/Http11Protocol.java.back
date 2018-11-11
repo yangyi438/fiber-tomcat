@@ -26,7 +26,7 @@ public class Http11Protocol extends AbstractHttp11JsseProtocol<CoSocket> {
 
 
     private static final org.apache.juli.logging.Log log
-            = org.apache.juli.logging.LogFactory.getLog(Http11Protocol.class);
+        = org.apache.juli.logging.LogFactory.getLog(Http11Protocol.class);
 
     @Override
     protected Log getLog() { return log; }
@@ -119,15 +119,15 @@ public class Http11Protocol extends AbstractHttp11JsseProtocol<CoSocket> {
          */
         @Override
         public void release(SocketWrapper<CoSocket> socket,
-                            Processor<CoSocket> processor, boolean isSocketClosing,
-                            boolean addToPoller) {
+                Processor<CoSocket> processor, boolean isSocketClosing,
+                boolean addToPoller) {
             processor.recycle(isSocketClosing);
             recycledProcessors.push(processor);
         }
 
         @Override
         protected void initSsl(SocketWrapper<CoSocket> socket,
-                               Processor<CoSocket> processor) {
+                Processor<CoSocket> processor) {
 //            if (proto.isSSLEnabled() && (proto.sslImplementation != null)) {
 //                processor.setSslSupport(
 //                        proto.sslImplementation.getSSLSupport(
@@ -140,7 +140,7 @@ public class Http11Protocol extends AbstractHttp11JsseProtocol<CoSocket> {
 
         @Override
         protected void longPoll(SocketWrapper<CoSocket> socket,
-                                Processor<CoSocket> processor) {
+                Processor<CoSocket> processor) {
             // NO-OP
         }
 

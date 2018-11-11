@@ -22,8 +22,8 @@ import java.net.SocketTimeoutException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
+import co.paralleluniverse.strands.concurrent.ReentrantReadWriteLock;
 import org.apache.coyote.InputBuffer;
 import org.apache.coyote.Request;
 import org.apache.juli.logging.Log;
@@ -646,7 +646,7 @@ public class InternalAprInputBuffer extends AbstractInputBuffer<Long> {
     private int doReadSocket(boolean block) {
 
         Lock readLock = wrapper.getBlockingStatusReadLock();
-        WriteLock writeLock = wrapper.getBlockingStatusWriteLock();
+        ReentrantReadWriteLock.WriteLock writeLock = wrapper.getBlockingStatusWriteLock();
 
         boolean readDone = false;
         int result = 0;
@@ -682,7 +682,7 @@ public class InternalAprInputBuffer extends AbstractInputBuffer<Long> {
             } finally {
                 // Should have been released above but may not have been on some
                 // exception paths
-                if (writeLock.isHeldByCurrentThread()) {
+                if (writeLock.isHeldByCurrentStrand()) {
                     writeLock.unlock();
                 }
             }
