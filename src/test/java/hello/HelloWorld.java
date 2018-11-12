@@ -1,5 +1,6 @@
 package hello;
 
+import javax.servlet.AsyncContext;
 import javax.servlet.ServletInputStream;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.annotation.WebServlet;
@@ -17,7 +18,7 @@ public  class HelloWorld extends HttpServlet {
         public void doPost(HttpServletRequest req, HttpServletResponse res)
                 throws IOException {
             System.out.println(Thread.currentThread());
-            req.startAsync();
+          //  AsyncContext asyncContext = req.startAsync();
             ServletInputStream inputStream = req.getInputStream();
             ServletOutputStream outputStream = res.getOutputStream();
             int counr = 0;

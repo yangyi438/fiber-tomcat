@@ -1,4 +1,7 @@
-import hello.HelloWorld;
+package hello;
+
+import co.paralleluniverse.fibers.Suspendable;
+import co.paralleluniverse.strands.concurrent.Semaphore;
 import org.apache.catalina.Context;
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.startup.Tomcat;
@@ -10,7 +13,9 @@ import java.net.InetAddress;
  */
 public class Start {
 
+
     public static void main(String[] args) throws Exception {
+        Semaphore semaphore = new Semaphore(10,true);
         Tomcat tomcat = new Tomcat();
         Connector connector = new Connector("org.apache.coyote.http11.Http11Protocol");
         //Connector connector = new Connector("org.apache.coyote.http11.Http11AprProtocol");
@@ -26,7 +31,7 @@ public class Start {
         tomcat.setConnector(connector);
         Context ctx = tomcat.addContext("", null);
         Tomcat.addServlet(ctx, "myServlet", new HelloWorld());
-        ctx.addServletMapping("/", "myServlet");
+        ctx.addServletMappingDecoded("/", "myServlet");
         tomcat.start();
         Thread.sleep(1000000000);
     }
