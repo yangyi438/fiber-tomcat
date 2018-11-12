@@ -15,6 +15,7 @@ import java.util.concurrent.TimeUnit;
 
 import co.paralleluniverse.fibers.Fiber;
 import co.paralleluniverse.fibers.FiberScheduler;
+import co.paralleluniverse.fibers.Suspendable;
 import io.netty.channel.nio.CoSocketEventLoop;
 import io.netty.channel.nio.CoSocketRegisterUtils;
 import io.netty.util.concurrent.Future;
@@ -307,6 +308,7 @@ public class JIoEndpoint3 extends AbstractEndpoint<CoSocket> {
             this.status = status;
         }
 
+        @Suspendable
         @Override
         public void run() {
             boolean launch = false;
