@@ -28,6 +28,7 @@ import java.util.regex.Pattern;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletResponse;
 
+import co.paralleluniverse.fibers.Suspendable;
 import org.apache.coyote.AbstractProcessor;
 import org.apache.coyote.ActionCode;
 import org.apache.coyote.AsyncContextCallback;
@@ -1028,6 +1029,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
      *
      * @throws IOException error during an I/O operation
      */
+    @Suspendable
     @Override
     public SocketState process(SocketWrapper<S> socketWrapper)
         throws IOException {
@@ -1887,6 +1889,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
      */
     protected abstract void setCometTimeouts(SocketWrapper<S> socketWrapper);
 
+    @Suspendable
     public void endRequest() {
 
         // Finish the handling of the request

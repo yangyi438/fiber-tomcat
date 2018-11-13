@@ -22,6 +22,7 @@ import java.io.InputStream;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 
+import co.paralleluniverse.fibers.Suspendable;
 import org.apache.coyote.InputBuffer;
 import org.apache.coyote.Request;
 import org.apache.juli.logging.Log;
@@ -526,10 +527,11 @@ public class InternalInputBuffer extends AbstractInputBuffer<CoSocket> {
      *
      * @return false if at end of stream
      */
+    @Suspendable
     protected boolean fill() throws IOException {
         return fill(true);
     }
-
+    @Suspendable
     @Override
     protected boolean fill(boolean block) throws IOException {
 
@@ -589,6 +591,7 @@ public class InternalInputBuffer extends AbstractInputBuffer<CoSocket> {
         /**
          * Read bytes into the specified chunk.
          */
+        @Suspendable
         @Override
         public int doRead(ByteChunk chunk, Request req )
             throws IOException {

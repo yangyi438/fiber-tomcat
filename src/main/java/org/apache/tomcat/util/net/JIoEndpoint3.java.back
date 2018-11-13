@@ -8,14 +8,12 @@ import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.util.Locale;
 import java.util.UnknownFormatConversionException;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executor;
-import java.util.concurrent.RejectedExecutionException;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 import co.paralleluniverse.fibers.Fiber;
 import co.paralleluniverse.fibers.FiberScheduler;
 import co.paralleluniverse.fibers.Suspendable;
+import com.google.common.collect.Queues;
 import io.netty.channel.nio.CoSocketEventLoop;
 import io.netty.channel.nio.CoSocketRegisterUtils;
 import io.netty.util.concurrent.Future;
@@ -457,14 +455,15 @@ public class JIoEndpoint3 extends AbstractEndpoint<CoSocket> {
         if (maxThreadsWithExecutor < 0) {
             maxThreadsWithExecutor = i;
         }
-        FiberScheduler fiberScheduler = ContainerFiberScheduler.createFiberScheduler("http-" + getLocalPort() + "fiber", maxThreadsWithExecutor);
-        this.executor = new Executor() {
-            @Override
-            public void execute(Runnable command) {
-                Fiber<Void> fiber = new Fiber<>("http--fiber", fiberScheduler, command::run);
-                fiber.start();
-            }
-        };
+        this.executor = new ForkJoinPool(10);
+//        FiberScheduler fiberScheduler = ContainerFiberScheduler.createFiberScheduler("http-" + getLocalPort() + "fiber", maxThreadsWithExecutor);
+//        this.executor = new Executor() {
+//            @Override
+//            public void execute(Runnable command) {
+//                Fiber<Void> fiber = new Fiber<>("http--fiber", fiberScheduler, command::run);
+//                fiber.start();
+//            }
+//        };
     }
 
     @Override
@@ -660,7 +659,7 @@ public class JIoEndpoint3 extends AbstractEndpoint<CoSocket> {
         }
     }
 
-
+    @Suspendable
     @Override
     public void processSocket(SocketWrapper<CoSocket> socket,
                               SocketStatus status, boolean dispatch) {

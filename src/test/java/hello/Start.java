@@ -1,11 +1,15 @@
 package hello;
 
+import co.paralleluniverse.fibers.Fiber;
 import co.paralleluniverse.fibers.Suspendable;
 import co.paralleluniverse.strands.concurrent.Semaphore;
+import io.netty.util.internal.SocketUtils;
 import org.apache.catalina.Context;
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.startup.Tomcat;
+import yy.code.io.cosocket.CoSocket;
 
+import java.io.IOException;
 import java.net.InetAddress;
 
 /**
@@ -15,7 +19,24 @@ public class Start {
 
 
     public static void main(String[] args) throws Exception {
-        Semaphore semaphore = new Semaphore(10,true);
+        new Fiber<Void>(() -> {
+            try {
+                CoSocket coSocket = new CoSocket();
+                coSocket.connect(SocketUtils.socketAddress("www.baidu.com", 80), 8000);
+                System.out.println("start");
+                coSocket.setSoTimeout(1000);
+                System.out.println(coSocket.getRemoteSocketAddress());
+                System.out.println("end");
+                coSocket.readBytes();
+                coSocket.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+        }).start();
+
+
+        Semaphore semaphore = new Semaphore(10, true);
         Tomcat tomcat = new Tomcat();
         Connector connector = new Connector("org.apache.coyote.http11.Http11Protocol");
         //Connector connector = new Connector("org.apache.coyote.http11.Http11AprProtocol");

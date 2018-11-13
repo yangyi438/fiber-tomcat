@@ -22,6 +22,7 @@ import java.security.PrivilegedAction;
 import java.util.Iterator;
 import java.util.concurrent.LinkedBlockingDeque;
 
+import co.paralleluniverse.fibers.Suspendable;
 import org.apache.coyote.ActionCode;
 import org.apache.coyote.ByteBufferHolder;
 import org.apache.coyote.OutputBuffer;
@@ -359,7 +360,9 @@ public abstract class AbstractOutputBuffer<S> implements OutputBuffer {
      * End request.
      *
      * @throws IOException an underlying I/O error occurred
+     *
      */
+    @Suspendable
     public void endRequest() throws IOException {
 
         if (!committed) {

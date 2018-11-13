@@ -35,6 +35,7 @@ import javax.management.ObjectName;
 import javax.servlet.http.HttpUpgradeHandler;
 import javax.servlet.http.WebConnection;
 
+import co.paralleluniverse.fibers.Suspendable;
 import org.apache.juli.logging.Log;
 import org.apache.tomcat.InstanceManager;
 import org.apache.tomcat.util.ExceptionUtils;
@@ -606,7 +607,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
             recycledProcessors.clear();
         }
 
-
+        @Suspendable
         public SocketState process(SocketWrapper<S> wrapper,
                 SocketStatus status) {
             if (wrapper == null) {

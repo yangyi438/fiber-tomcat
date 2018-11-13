@@ -19,6 +19,7 @@ package org.apache.coyote.http11;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
+import co.paralleluniverse.fibers.Suspendable;
 import org.apache.coyote.InputBuffer;
 import org.apache.coyote.Request;
 import org.apache.juli.logging.Log;
@@ -265,6 +266,7 @@ public abstract class AbstractInputBuffer<S> implements InputBuffer{
      *
      * @throws IOException an underlying I/O error occurred
      */
+    @Suspendable
     public void endRequest() throws IOException {
 
         if (swallowInput && (lastActiveFilter != -1)) {

@@ -20,6 +20,7 @@ package org.apache.coyote.http11.filters;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
+import co.paralleluniverse.fibers.Suspendable;
 import org.apache.coyote.InputBuffer;
 import org.apache.coyote.Request;
 import org.apache.coyote.http11.InputFilter;
@@ -146,7 +147,7 @@ public class IdentityInputFilter implements InputFilter {
         remaining = contentLength;
     }
 
-
+    @Suspendable
     @Override
     public long end() throws IOException {
 
